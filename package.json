@@ -1,0 +1,31 @@
+{
+  "name": "fitbit-api",
+  "version": "1.0.0",
+  "description": "User authorization and retrieving steps and heart rate information",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShrujanKotturi/fitbit.git"
+  },
+  "keywords": [
+    "fitbit"
+  ],
+  "author": "Shrujan Kotturi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShrujanKotturi/fitbit/issues"
+  },
+  "homepage": "https://github.com/ShrujanKotturi/fitbit#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "ejs": "^2.5.2",
+    "express": "^4.14.0",
+    "fitbit-node": "^2.0.2",
+    "fs": "0.0.1-security",
+    "node-persist": "^2.0.7",
+    "util": "^0.10.3"
+  }
+}
