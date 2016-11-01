@@ -56,6 +56,23 @@
 			xmlhttp.send();
 		}
 
+//		function logout(){
+//			$.ajax('/logout', {
+//				method: 'POST',
+//				headers: {
+//					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+//				},
+//				data: {
+//					token:
+//				}
+//			}).fail(function(xhr, textStatus, errorThrown) {
+//				alert(JSON.parse(xhr.responseText).status);
+//			}).then(function(xhr, data) {
+//				console.log(data);
+//				window.location.href = '/views';
+//			});
+//
+//		}
 
 	</script>
 </head>
@@ -73,6 +90,11 @@
 			<a class="navbar-brand">Fitbit API</a>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
+			<li>
+				<a href="/logout" target="_self" class="btn btn-simple btn-white btn-just-icon">
+					<i class="fa fa-power-off"></i>
+					<div class="ripple-container"></div></a>
+			</li>
 		</ul>
 	</div>
 	</div>

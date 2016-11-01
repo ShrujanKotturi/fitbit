@@ -29,7 +29,7 @@ app.use('/assets', express.static('assets'));
 
 app.get('/views', function (req, res) {
     console.log(__dirname);
-    res.render(__dirname+'/views/signup-page')
+    res.render(__dirname+'/views/signup-page');
 });
 
 
