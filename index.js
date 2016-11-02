@@ -6,7 +6,8 @@ var express = require('express'),
     bodyparser = require('body-parser'),
     routes = require('./routes'),
     app = express(),
-    PORT = process.env.PORT || 3000;
+    PORT = process.env.PORT || 3000,
+    session = require('express-session');
 
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(bodyparser.json());
@@ -16,7 +17,11 @@ app.use(function(req,res,next){
     next();
 });
 
-
+app.use(session({
+    secret: 'session',
+    resave: false,
+    saveUninitialized: true
+}));
 
 
 app.set('view engine', 'ejs');
