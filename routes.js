@@ -62,7 +62,6 @@ module.exports = {
         });
 
         app.get('/profile', function (req, res){
-
             client.get("/profile.json", req.session.access_token).then(function (results) {
                 res.send(results[0]);
             });

@@ -37,33 +37,44 @@
 				if (this.readyState == 4 && this.status == 200) {
 					var myArr = JSON.parse(this.responseText);
 
-					console.log(myArr);
+					//console.log(myArr);
 
-					document.getElementById("profileImage").src = myArr.user.avatar150;
-					document.getElementById("userName").innerHTML = myArr.user.displayName;
-					document.getElementById("DOB").innerHTML = "Date of Birth : "+ myArr.user.dateOfBirth;
-					document.getElementById("gender").innerHTML = "Gender : "+ myArr.user.gender;
-					document.getElementById("avgSteps").innerHTML = "Average Steps Daily : "+ myArr.user.averageDailySteps;
+                    if(!(myArr.errors)) {
 
-					var userBadges = myArr.user.topBadges;
+                        document.getElementById("profileImage").src = myArr.user.avatar150;
+                        document.getElementById("userName").innerHTML = myArr.user.displayName;
+                        document.getElementById("DOB").innerHTML = "Date of Birth : " + myArr.user.dateOfBirth;
+                        document.getElementById("gender").innerHTML = "Gender : " + myArr.user.gender;
+                        document.getElementById("avgSteps").innerHTML = "Average Steps Daily : " + myArr.user.averageDailySteps;
 
-					var images = "", buttons= "";
-					if(userBadges.length >0) {
-						for (var i = 0; i < userBadges.length; i++) {
-							var badge = userBadges[i];
-							images = images + "<div class=\"col-md-4\"> <img src=" + badge.image125px + "  class =\"img-rounded\" /> </div>";
-						}
-					}else{
-						images = "<div class=\"alert alert-info\"><div class=\"container-fluid\"><div class=\"alert-icon\"><i class=\"material-icons\">info_outline</i>" +
-								"</div><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\"><i class=\"material-icons\">clear" +
-								"</i></span></button><b>Info alert:</b> No badges to display...</div></div>";
-					}
+                        var userBadges = myArr.user.topBadges;
 
-                    buttons = "<li class=\"\"> <a href=\"/steps\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on steps\"> <i class=\"material-icons\">timeline</i> Steps </a> </li>";
-                    buttons += "<li class=\"\"> <a href=\"/heart\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on Heart rate\"> <i class=\"material-icons\">favorite</i> Steps </a> </li>";
+                        var images = "", buttons = "";
+                        if (userBadges.length > 0) {
+                            for (var i = 0; i < userBadges.length; i++) {
+                                var badge = userBadges[i];
+                                images = images + "<div class=\"col-md-4\"> <img src=" + badge.image125px + "  class =\"img-rounded\" /> </div>";
+                            }
+                        } else {
+                            images = "<div class=\"alert alert-info\"><div class=\"container-fluid\"><div class=\"alert-icon\"><i class=\"material-icons\">info_outline</i>" +
+                                    "</div><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\"><i class=\"material-icons\">clear" +
+                                    "</i></span></button><b>Info alert:</b> No badges to display...</div></div>";
+                        }
 
-					document.getElementById("badges").innerHTML = images;
-                    document.getElementById("buttons").innerHTML = buttons;
+                        buttons = "<li class=\"\"> <a href=\"/steps\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on steps\"> <i class=\"material-icons faa-bounce animated-hover fa-2x\">timeline</i> Steps </a> </li>";
+                        buttons += "<li class=\"\"> <a href=\"/heart\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on Heart rate\"> <i class=\"fa fa-heartbeat faa-pulse animated-hover fa-3x\"></i> Heart Beats </a> </li>";
+
+                        document.getElementById("badges").innerHTML = images;
+                        document.getElementById("buttons").innerHTML = buttons;
+                    }else{
+                        console.log(myArr)
+                        $('#myModal').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        },'show');
+
+                        document.getElementById("errormessage").innerHTML = myArr.errors[0].message;
+                    }
 				}
 			};
 			xmlhttp.open("GET", url, true);
@@ -143,6 +154,24 @@
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="myModalLabel">Access Restricted</h4>
+            </div>
+            <div class="modal-body" id="errormessage">
+
+            </div>
+            <div class="modal-footer">
+                <a href="/views" class="btn btn-info btn-simple">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <footer class="footer">
 	<div class="container">
 		<nav class="pull-left">
@@ -150,7 +179,7 @@
 			</ul>
 		</nav>
 		<div class="copyright pull-right">
-			Fitbit Application 2016, made with <i class="fa fa-heart heart"></i> by Group 5
+			Fitbit Application 2016, made with <i class="fa fa-heart heart faa-pulse animated"></i> by Group 5
 		</div>
 	</div>
 </footer>
