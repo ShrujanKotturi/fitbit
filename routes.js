@@ -68,7 +68,7 @@ module.exports = {
         });
 
         app.get('/steps', function (req, res){
-            client.get("/activities/date/2016-10-26.json", req.session.access_token).then(function (results) {
+            client.get("/activities/steps/date/today/1m.json", req.session.access_token).then(function (results) {
                 res.send(results[0]);
             }).catch(function (error){
                 res.send(error);
@@ -76,7 +76,7 @@ module.exports = {
         });
 
         app.get('/heart', function (req, res){
-            client.get("/activities/heart/date/today/7d.json", req.session.access_token).then(function (results) {
+            client.get("/activities/heart/date/2016-10-26/today.json", req.session.access_token).then(function (results) {
                 res.send(results[0]);
             }).catch(function (error){
                 res.send(error);

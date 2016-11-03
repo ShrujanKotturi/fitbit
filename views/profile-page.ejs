@@ -14,6 +14,7 @@
 	<!-- CSS Files -->
 	<link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
 	<link href="../assets/css/material-kit.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
 
     <!--   Core JS Files   -->
     <script src="../assets/js/jquery.min.js" type="text/javascript"></script>
@@ -25,10 +26,11 @@
     <script src="../assets/js/bootstrap-datepicker.js" type="text/javascript"></script>
     <!-- Control Center for Material Kit: activating the ripples, parallax effects, scripts from the example pages etc -->
     <script src="../assets/js/material-kit.js" type="text/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.6/raphael.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 
 	<script>
-		function loadUserData()
-		{
+		function loadUserData(){
 			var xmlhttp = new XMLHttpRequest();
 
 			var url = "/profile";
@@ -37,7 +39,7 @@
 				if (this.readyState == 4 && this.status == 200) {
 					var myArr = JSON.parse(this.responseText);
 
-					//console.log(myArr);
+					console.log(myArr);
 
                     if(!(myArr.errors)) {
 
@@ -53,7 +55,7 @@
                         if (userBadges.length > 0) {
                             for (var i = 0; i < userBadges.length; i++) {
                                 var badge = userBadges[i];
-                                images = images + "<div class=\"col-md-4\"> <img src=" + badge.image125px + "  class =\"img-rounded\" /> </div>";
+                                images = images + "<div class=\"col-md-4\"> <img src=" + badge.image125px + " class =\"img-rounded\" data-toggle=\"tooltip\" data-placement=\"auto\" /> </div>";
                             }
                         } else {
                             images = "<div class=\"alert alert-info\"><div class=\"container-fluid\"><div class=\"alert-icon\"><i class=\"material-icons\">info_outline</i>" +
@@ -61,8 +63,8 @@
                                     "</i></span></button><b>Info alert:</b> No badges to display...</div></div>";
                         }
 
-                        buttons = "<li class=\"\"> <a href=\"/steps\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on steps\"> <i class=\"material-icons faa-bounce animated-hover fa-2x\">timeline</i> Steps </a> </li>";
-                        buttons += "<li class=\"\"> <a href=\"/heart\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on Heart rate\"> <i class=\"fa fa-heartbeat faa-pulse animated-hover fa-3x\"></i> Heart Beats </a> </li>";
+                        buttons = "<li class=\"\"> <a onclick=\"return loadStepsInfo();\"role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on steps\" data-target=\".steps-modal\"> <i class=\"material-icons faa-bounce animated-hover fa-2x\">timeline</i> Steps </a> </li>";
+                        buttons += "<li class=\"\"> <a onclick=\"loadHeartData()\" role=\"tab\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detailed information on Heart rate\" data-target=\".heart-modal\"> <i class=\"fa fa-heartbeat faa-pulse animated-hover fa-3x\"></i> Heart Beats </a> </li>";
 
                         document.getElementById("badges").innerHTML = images;
                         document.getElementById("buttons").innerHTML = buttons;
@@ -77,6 +79,125 @@
                     }
 				}
 			};
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();
+		}
+
+		function loadStepsInfo(){
+			var xmlhttp = new XMLHttpRequest();
+
+			var url = "/steps";
+
+			xmlhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var myArr = JSON.parse(this.responseText);
+					//console.log(myArr);
+					//console.log(myArr['activities-steps']);
+
+					if(!(myArr.errors)) {
+						$('#myStepsVisualization').addClass('modal-body');
+						Morris.Bar({
+							// ID of the element in which to draw the chart.
+							element: 'myStepsVisualization',
+							// Chart data records -- each entry in this array corresponds to a point on
+							// the chart.
+							data: myArr['activities-steps'],
+							// The name of the data record attribute that contains x-values.
+							xkey: 'dateTime',
+							// A list of names of data record attributes that contain y-values.
+							ykeys: ['value'],
+							// Labels for the ykeys -- will be displayed when you hover over the
+							// chart.
+							labels: ['Value'],
+							resize:true
+						});
+
+						if($('#myStepsVisualization').find('svg').length > 1){
+							// Morris Charts creates svg by append, you need to remove first SVG
+							$('#myStepsVisualization svg:first').remove();
+							// Also Morris Charts created for hover div by prepend, you need to remove last DIV
+							$(".morris-hover:last").remove();
+						}
+						// Smooth Loading
+						$('.stepsjs-loading').addClass('hidden');
+					}else{
+						document.getElementById("myStepsVisualization").innerHTML = myArr.errors[0].message;
+						$('#myStepsVisualization').addClass('modal-body');
+						$('.stepsjs-loading').addClass('hidden');
+					}
+					$('#mySteps').modal({
+						backdrop: 'static',
+						keyboard: true
+					},'show');
+				}
+			}
+			;
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();
+		}
+
+
+
+		function loadHeartData(){
+			var xmlhttp = new XMLHttpRequest();
+
+			var url = "/heart";
+
+			xmlhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var myArr = JSON.parse(this.responseText);
+
+					console.log(myArr);
+
+
+					if(!(myArr.errors)) {
+						$('#myHeartVisualization').addClass('modal-body');
+						var data =[];
+						for(var i = 0; i<myArr['activities-heart'].length; i++){
+							data.push({
+								"dataTime":myArr['activities-heart'][i].dateTime,
+								"restingHeartRate": !(myArr['activities-heart'][i].value.restingHeartRate) ? 72 : (myArr['activities-heart'][i].value.restingHeartRate)
+							});
+						}
+						console.log(data);
+
+						Morris.Line({
+							// ID of the element in which to draw the chart.
+							element: 'myHeartVisualization',
+							// Chart data records -- each entry in this array corresponds to a point on
+							// the chart.
+							data: data,
+							// The name of the data record attribute that contains x-values.
+							xkey: 'dataTime',
+							// A list of names of data record attributes that contain y-values.
+							ykeys: ['restingHeartRate'],
+							// Labels for the ykeys -- will be displayed when you hover over the
+							// chart.
+							labels: ['Value'],
+							resize:true
+						});
+
+						if($('#myHeartVisualization').find('svg').length > 1){
+							// Morris Charts creates svg by append, you need to remove first SVG
+							$('#myHeartVisualization svg:first').remove();
+							// Also Morris Charts created for hover div by prepend, you need to remove last DIV
+							$(".morris-hover:last").remove();
+						}
+						// Smooth Loading
+						$('.heartjs-loading').addClass('hidden');
+
+					}else{
+						$('.heartjs-loading').addClass('hidden');
+						$('#myHeartVisualization').addClass('modal-body');
+						document.getElementById("myHeartVisualization").innerHTML = myArr.errors[0].message;
+					}
+					$('#myHeart').modal({
+						backdrop: 'static',
+						keyboard: true
+					},'show');
+				}
+			}
+			;
 			xmlhttp.open("GET", url, true);
 			xmlhttp.send();
 		}
@@ -154,11 +275,11 @@
 		</div>
 	</div>
 </div>
+
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-
                 <h4 class="modal-title" id="myModalLabel">Access Restricted</h4>
             </div>
             <div class="modal-body" id="errormessage">
@@ -171,6 +292,45 @@
     </div>
 </div>
 
+<div class="modal fade steps-modal" id="mySteps" tabindex="-1" role="dialog" aria-labelledby="myLargeStepsLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<h4 class="modal-title" id="myStepsLabel">Steps information</h4>
+			</div>
+			<div class="stepsjs-loading text-center">
+				<h3>Loading...</h3>
+			</div>
+			<div id="myStepsVisualization" style="height: 400px;" ></div>
+
+			<!--<div class="modal-body" id="myStepsVisualization">-->
+			</div>
+			<div class="modal-footer">
+				<!--<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>-->
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade heart-modal" id="myHeart" tabindex="-1" role="dialog" aria-labelledby="myLargeHeartLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<h4 class="modal-title" id="myHeartLabel">Heart beat information</h4>
+			</div>
+			<div class="heartjs-loading text-center">
+				<h3>Loading...</h3>
+			</div>
+			<div id="myHeartVisualization" style="height: 400px;">
+			</div>
+			<div class="modal-footer">
+				<!--<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>-->
+			</div>
+		</div>
+	</div>
+</div>
 
 <footer class="footer">
 	<div class="container">
